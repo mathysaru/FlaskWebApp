@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>ACEest Fitness & Gym</title>
+    <!-- Link external CSS -->
+    <link
+      rel="stylesheet"
+      href="{{ url_for('static', filename='style.css') }}"
+    />
+  </head>
+  <body>
+    <div class="card">
+      <h1>ACEest Fitness & Gym</h1>
+      <p class="muted">Add a workout and view your log.</p>
+
+      <div class="row">
+        <div>
+          <label for="workout">Workout</label>
+          <input id="workout" placeholder="e.g., Running" />
+          <span id="workout-error" class="error"></span>
+        </div>
+        <div>
+          <label for="duration">Duration (minutes)</label>
+          <input id="duration" type="number" min="1" placeholder="30" />
+          <span id="duration-error" class="error"></span>
+        </div>
+      </div>
+      <button id="addBtn">🏋️ Add Workout</button>
+
+      <h2>Logged Workouts</h2>
+      <div class="list-container">
+        <ul id="list"></ul>
+      </div>
+    </div>
+
+    <script>
+      async function fetchWorkouts() {
+        const res = await fetch("/api/workouts");
+        const data = await res.json();
+        const list = document.getElementById("list");
+        list.innerHTML = "";
+        if (data.length === 0) {
+          list.innerHTML = '<li class="muted">No workouts yet.</li>';
+          return;
+        }
+        for (const w of data) {
+          const li = document.createElement("li");
+          li.textContent = `${w.workout} — ${w.duration} min`;
+          list.appendChild(li);
+        }
+      }
+
+      // async function addWorkout() {
+      //   const workout = document.getElementById('workout').value.trim();
+      //   const duration = document.getElementById('duration').value;
+      //   const res = await fetch('/api/workouts', {
+      //     method: 'POST',
+      //     headers: { 'Content-Type': 'application/json' },
+      //     body: JSON.stringify({ workout, duration })
+      //   });
+      //   if (res.ok) {
+      //     document.getElementById('workout').value = '';
+      //     document.getElementById('duration').value = '';
+      //     await fetchWorkouts();
+      //   } else {
+      //     const err = await res.json();
+      //     alert(err.error || 'Failed to add workout');
+      //   }
+      // }
+      async function addWorkout() {
+        // Clear previous errors
+        document.getElementById("workout-error").textContent = "";
+        document.getElementById("duration-error").textContent = "";
+
+        const workout = document.getElementById("workout").value.trim();
+        const duration = document.getElementById("duration").value;
+
+        const res = await fetch("/api/workouts", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ workout, duration }),
+        });
+
+        if (res.ok) {
+          document.getElementById("workout").value = "";
+          document.getElementById("duration").value = "";
+          await fetchWorkouts();
+        } else {
+          const err = await res.json();
+          // Show error below fields
+          if (err.error.includes("Workout")) {
+            document.getElementById("workout-error").textContent = err.error;
+          } else if (err.error.includes("Duration")) {
+            document.getElementById("duration-error").textContent = err.error;
+          }
+        }
+      }
+
+      document.getElementById("addBtn").addEventListener("click", addWorkout);
+      fetchWorkouts();
+    </script>
+  </body>
+</html>
