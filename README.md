@@ -120,16 +120,7 @@ aceest-fitness-devops/
 
 ---
 
-## Marking checklist (map to assignment rubric)
-
-  - **Flask app**: Core routes + simple UI
-  - **Git usage**: Meaningful commits, feature branches, PRs 
-  - **Pytest**: Health, create/list, and validation tests 
-  - **Docker**: Slim image; runs app and tests 
-  - **GitHub Actions**: Build + test on every push 
-  - **README**: Local + Docker + CI instructions 
-
-## Learnings (Assignment Reflection)
+## Learnings
 
   - Understood how Flask apps are structured with routes, templates, and models.
   - Learned to write a Dockerfile and solve common issues with dependencies.
